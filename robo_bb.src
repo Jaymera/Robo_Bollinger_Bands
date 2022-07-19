@@ -1,0 +1,48 @@
+const 
+  verde    = clLime;
+  vermelho = clRed;
+
+input 
+  Periodo(21);
+  Desvio(2.0);
+  TipoMedia(1);
+  Tipo(0);
+
+var
+bb : float;
+sinalC, sinalV : Booleano;
+
+begin
+
+  bb := BollingerBPerc(Desvio,Periodo,TipoMedia);
+
+  sinalC := (bb[1] < 0) and (bb[0] > 0);
+  sinalV := (bb[1] > 100) and (bb[0] < 100);
+
+  if IsBought then
+    SellToCoverStop(low[2],low[2],100)
+  else if IsSold then
+    BuyToCoverStop(high[2],high[2],100);
+
+  if (BuyPosition = 0) and (SellPosition = 0) then
+  begin
+     if (SinalC) and ((Tipo = 0) or (Tipo = 1)) then
+     begin
+       BuyAtMarket;
+       //BuyLimit(high[1], 100);
+       PaintBar(verde);
+     end else
+     if (sinalV) and ((Tipo = 0) or (Tipo = 2)) then
+     begin
+       SellShortAtMarket;
+       //SellShortLimit(low[1], 100);
+       PaintBar(vermelho);
+     end;
+  end;
+
+  if (IsBought) and (close[0] >= MediaExp(21, close)) then
+    SellToCoverAtMarket
+  else if (IsSold) and (close[0] <= MediaExp(21, close)) then
+    BuyToCoverAtMarket;
+ 
+end;
